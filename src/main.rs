@@ -1,5 +1,24 @@
 use actix_web::{HttpServer, App};
-use sqlx::postgres::PgConnectOptions;
+use sqlx::{postgres::PgConnectOptions, PgPool};
+
+async fn get_db_pool() -> PgPool {
+    let pg_host = std::env::var("POSTGRES_HOST")
+        .expect("POSTGRES_HOST ENV VAR NOT SET");
+    let pg_port = std::env::var("POSTGRES_PORT")
+        .expect("POSTGRES_PORT ENV VAR NOT SET");
+    let pg_pass = std::env::var("POSTGRES_PASSWORD")
+        .expect("POSTGRES_PASSWORD ENV VAR NOT SET");
+
+    let db_connection = PgPool::connect_with(
+        PgConnectOptions::new()
+            .host(&pg_host)
+            .port(pg_port.parse().unwrap())
+            .username("postgres")
+            .password(&pg_pass)
+            .database("cyber_bank_rs")
+    ).await.unwrap();
+    return db_connection;
+}
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -8,29 +27,15 @@ async fn main() -> std::io::Result<()> {
             .default_filter_or("DEBUG")
     );
 
-    let pg_host = std::env::var("POSTGRES_HOST")
-        .expect("POSTGRES_HOST ENV VAR NOT SET");
-    let pg_port = std::env::var("POSTGRES_PORT")
-        .expect("POSTGRES_PORT ENV VAR NOT SET");
-    let pg_pass = std::env::var("POSTGRES_PASSWORD")
-        .expect("POSTGRES_PASSWORD ENV VAR NOT SET");
-
-    let db_connection = sqlx::PgPool::connect_with(
-        PgConnectOptions::new()
-            .host(&pg_host)
-            .port(pg_port.parse().unwrap())
-            .username("postgres")
-            .password(&pg_pass)
-            .database("cyber_bank_rs")
-    ).await.unwrap();
+    let pool = get_db_pool().await;
 
     sqlx::query_file!("./migrations/setup.sql")
-        .fetch_all(&db_connection)
+        .fetch_all(&pool)
         .await
         .unwrap();
 
     HttpServer::new(move || {
-        let conn = db_connection.clone();
+        let conn = pool.clone();
         App::new()
             .configure(cyber_bank_rs::auth::config)
             .app_data(conn)
