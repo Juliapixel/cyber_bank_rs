@@ -14,7 +14,7 @@ struct DbUser {
 /// salts and hashes the given password using the Argon2id hashing algorithm,
 /// creating a 256-bit long hash with 2 iterations, 1 level of parallelism and
 /// 32MB of memory used
-pub fn salt_and_hash(passwd: String, salt: &[u8]) -> Vec<u8> {
+fn salt_and_hash(passwd: String, salt: &[u8]) -> Vec<u8> {
     let hashed_salted_passwd = argon2::hash_raw(
         passwd.as_bytes(),
         salt,
