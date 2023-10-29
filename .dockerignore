@@ -1,0 +1,7 @@
+/Dockerfile
+/compose.yaml
+/.dockerignore
+/target
+
+# make sqlx happy
+/.env
