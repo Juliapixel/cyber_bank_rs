@@ -29,6 +29,7 @@ async fn main() -> std::io::Result<()> {
 
     let pool = get_db_pool().await;
 
+    // sets up tables and stuff for the database (in case it wasn't already set up)
     sqlx::query_file!("./migrations/setup.sql")
         .fetch_all(&pool)
         .await
@@ -37,12 +38,15 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         let conn = pool.clone();
         App::new()
+            // authentication endpoints
             .service(
                 web::scope("/auth")
                     .service(
+                        // yeah, there's only one version, so what
                         web::scope("/v1")
                             .configure(cyber_bank_rs::auth::config)
                     )
+                    // should be set to latest version
                     .configure(cyber_bank_rs::auth::config)
             )
             .app_data(conn)

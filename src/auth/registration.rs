@@ -19,6 +19,13 @@ enum InvalidPasswordError {
     InvalidChar(char),
 }
 
+/// checks that the password fits a number of security constraints:
+/// - length greater than 8
+/// - contains at least one lowercase ASCII character
+/// - contains at least one uppercase ASCII character
+/// - contains at least one numeric ASCII character
+/// - contains at least one "special" ASCII character, as defined by `char::is_ascii_punctuation()`
+/// - does not contain any non-ASCII characters (sorry)
 fn validate_password(passwd: &str) -> Result<(), InvalidPasswordError> {
     use InvalidPasswordError as E;
 
@@ -73,6 +80,9 @@ enum InvalidUsernameError {
     AlreadyInUse
 }
 
+/// checks that usernames fit a number of constraints:
+/// - length is greater than 4 and smaller than 32 (might be changed later)
+/// - only contains ASCII alphanumeric characters and/or the characters '.', '_' and '-'
 fn validate_username(username: &str) -> Result<(), InvalidUsernameError> {
     use InvalidUsernameError as E;
 
@@ -126,6 +136,9 @@ fn get_email_validator() -> &'static Regex {
     })
 }
 
+/// creates a user account, verifying validity of given username, email and
+/// password.
+// TODO: make sure usernames are case-insensitive and can only be lowercase
 pub async fn register(req: HttpRequest, userinfo: Json<Registerer>) -> impl Responder {
     let mut errors: Vec<RegisterError> = Vec::new();
 
