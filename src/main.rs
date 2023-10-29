@@ -1,4 +1,4 @@
-use actix_web::{HttpServer, App};
+use actix_web::{HttpServer, App, web};
 use sqlx::{postgres::PgConnectOptions, PgPool};
 
 async fn get_db_pool() -> PgPool {
@@ -37,7 +37,14 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         let conn = pool.clone();
         App::new()
-            .configure(cyber_bank_rs::auth::config)
+            .service(
+                web::scope("/auth")
+                    .service(
+                        web::scope("/v1")
+                            .configure(cyber_bank_rs::auth::config)
+                    )
+                    .configure(cyber_bank_rs::auth::config)
+            )
             .app_data(conn)
     }).bind(("0.0.0.0", 8080))
         .unwrap()

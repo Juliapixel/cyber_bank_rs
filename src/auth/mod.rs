@@ -31,6 +31,6 @@ pub fn salt_and_hash(passwd: String, salt: &[u8]) -> Vec<u8> {
 }
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
-    cfg.route("/auth/v1/register", actix_web::web::post().to(registration::register))
-        .route("/auth/v1/login", actix_web::web::get().to(login::login));
+    cfg.route("/register", actix_web::web::post().to(registration::register))
+        .route("/login", actix_web::web::get().to(login::login));
 }
