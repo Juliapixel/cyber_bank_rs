@@ -17,7 +17,7 @@ services:
       - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
   db:
-    image: postgres:latest
+    image: postgres:16
     networks:
       - net
     volumes:
