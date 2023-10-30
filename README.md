@@ -1,5 +1,18 @@
 # cyber_bank_rs
 
+## Status
+
+- [x] user registration and authentication endpoints
+- [ ] token-based session management (possibly using redis?)
+- [ ] bank account management endpoints
+- [ ] money transfer endpoints
+- [ ] (fake) currency exchange with simulated value fluctuations
+- [ ] (maybe) stock exchange simulation (maybe) using real live data
+- [ ] a web UI for all of the above items
+
+not planned:
+- native UIs (mobile, dekstop)
+
 ## Building
 building requires a connection to a PostgreSQL database with the correct relations set up.
 
