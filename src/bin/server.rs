@@ -1,24 +1,5 @@
 use actix_web::{HttpServer, App, web};
-use sqlx::{postgres::PgConnectOptions, PgPool};
-
-async fn get_db_pool() -> PgPool {
-    let pg_host = std::env::var("POSTGRES_HOST")
-        .expect("POSTGRES_HOST ENV VAR NOT SET");
-    let pg_port = std::env::var("POSTGRES_PORT")
-        .expect("POSTGRES_PORT ENV VAR NOT SET");
-    let pg_pass = std::env::var("POSTGRES_PASSWORD")
-        .expect("POSTGRES_PASSWORD ENV VAR NOT SET");
-
-    let db_connection = PgPool::connect_with(
-        PgConnectOptions::new()
-            .host(&pg_host)
-            .port(pg_port.parse().unwrap())
-            .username("postgres")
-            .password(&pg_pass)
-            .database("cyber_bank_rs")
-    ).await.unwrap();
-    return db_connection;
-}
+use cyber_bank_rs::db;
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -27,13 +8,10 @@ async fn main() -> std::io::Result<()> {
             .default_filter_or("DEBUG")
     );
 
-    let pool = get_db_pool().await;
+    let pool = db::get_db_pool().await;
 
     // sets up tables and stuff for the database (in case it wasn't already set up)
-    sqlx::query_file!("./migrations/setup.sql")
-        .fetch_all(&pool)
-        .await
-        .unwrap();
+    db::set_up_db_tables(&pool).await;
 
     HttpServer::new(move || {
         let conn = pool.clone();
