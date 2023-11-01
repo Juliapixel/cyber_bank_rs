@@ -13,6 +13,72 @@
 not planned:
 - native UIs (mobile, dekstop)
 
+## Available API endpoints
+
+### `/auth/register`
+
+#### example request:
+
+Headers:
+- Content-type: application/json
+
+Content:
+```json
+{
+    "email": "{email}",
+    "username": "{username}",
+    "password": "{password}"
+}
+```
+
+##### on success:
+
+HTTP Status 201
+
+Content:
+
+```json
+null
+```
+
+##### on failure:
+
+HTTP Status 400
+
+Content:
+
+```json
+{
+    ["{failure_point}": "{failure_reason}"]
+}
+```
+
+### `/auth/login`
+
+#### example request:
+
+Headers:
+- Content-type: application/json
+
+Content:
+```json
+{
+    "username": "{username}",
+    "password": "{password}"
+}
+```
+
+##### on success:
+
+HTTP Status 200
+
+TODO: return a JWT token
+
+##### on failure:
+
+HTTP Status 403
+
+
 ## Building
 building requires a connection to a PostgreSQL database with the correct relations set up.
 
