@@ -90,3 +90,11 @@ building requires a connection to a PostgreSQL database with the correct relatio
 5. run `sqlx migrate run`
 
 after that, just run `cargo build --release --locked`
+
+## Running
+
+1. add the following variables to your `.env` file:
+    - `POSTGRES_HOST={database_hostname}`
+    - `POSTGRES_PORT={database_port}`
+    - `POSTGRES_PASSWORD={database_password}`
+2. run `cargo run --release --locked --bin server`
