@@ -20,8 +20,26 @@ pub async fn get_db_pool() -> PgPool {
 }
 
 pub async fn set_up_db_tables(pool: &PgPool) {
-    sqlx::query_file!("./migrations/setup.sql")
-        .fetch_all(pool)
-        .await
-        .unwrap();
+    sqlx::migrate!("./migrations/").run(pool).await.unwrap();
+}
+
+#[allow(unused_must_use)]
+pub async fn create_database() {
+    let pg_host = dotenvy::var("POSTGRES_HOST")
+        .expect("POSTGRES_HOST ENV VAR NOT SET");
+    let pg_port = dotenvy::var("POSTGRES_PORT")
+        .expect("POSTGRES_PORT ENV VAR NOT SET");
+    let pg_pass = dotenvy::var("POSTGRES_PASSWORD")
+        .expect("POSTGRES_PASSWORD ENV VAR NOT SET");
+
+    let db_connection = PgPool::connect_with(
+        PgConnectOptions::new()
+            .host(&pg_host)
+            .port(pg_port.parse().unwrap())
+            .username("postgres")
+            .password(&pg_pass)
+            .database("postgres")
+    ).await.unwrap();
+
+    sqlx::query("CREATE DATABASE cyber_bank_rs;").execute(&db_connection).await;
 }

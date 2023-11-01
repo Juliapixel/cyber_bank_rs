@@ -6,6 +6,7 @@ async fn main() -> std::io::Result<()> {
         env_logger::Env::default()
             .default_filter_or("DEBUG")
     );
+    db::create_database().await;
 
     let pool = db::get_db_pool().await;
 
