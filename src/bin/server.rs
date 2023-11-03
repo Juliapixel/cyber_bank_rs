@@ -1,5 +1,5 @@
-use actix_web::{HttpServer, App, web};
-use cyber_bank_rs::db;
+use actix_web::{HttpServer, App, web, middleware::Logger};
+use cyber_bank_rs::{db, auth::token::validation::ScopeValidator};
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -16,9 +16,11 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         let conn = pool.clone();
         App::new()
+            .wrap(Logger::default())
             // authentication endpoints
             .service(
                 web::scope("/auth")
+                    .wrap(ScopeValidator::new(&[]))
                     .service(
                         // yeah, there's only one version, so what
                         web::scope("/v1")

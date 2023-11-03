@@ -1,6 +1,8 @@
 pub mod login;
 pub mod registration;
 
+pub mod token;
+
 #[allow(dead_code)]
 struct DbUser {
     id: i64,

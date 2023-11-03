@@ -20,8 +20,8 @@ pub async fn login(req: HttpRequest, userinfo: Json<LoginRequester>) -> impl Res
     match selection {
         Ok(o) => {
             let hashed_salted_passwd = super::salt_and_hash(userinfo.password.clone(), o.salt.as_slice());
-            if o.password == hashed_salted_passwd { return HttpResponse::Ok() } else { return HttpResponse::Forbidden() }
+            if o.password == hashed_salted_passwd { return HttpResponse::Ok().finish() } else { return HttpResponse::Forbidden().finish() }
         },
-        Err(_) => return HttpResponse::Forbidden(),
+        Err(_) => return HttpResponse::Forbidden().respond_to(&req),
     };
 }
