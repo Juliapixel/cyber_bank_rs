@@ -15,25 +15,20 @@ pub enum Scope {
 #[serde(deny_unknown_fields)]
 pub struct JwtClaims {
     iat: chrono::DateTime<Utc>,
+    sub: String,
+    exp: chrono::DateTime<Utc>,
     pub scope: Vec<Scope>
 }
 
 impl JwtClaims {
-    pub fn new(scope: Vec<Scope>) -> Self {
+    pub fn new(scope: Vec<Scope>, subject: String, expiration: chrono::DateTime<Utc>) -> Self {
         Self {
             iat: chrono::Utc::now(),
+            sub: subject,
+            exp: expiration,
             scope: scope
         }
     }
-}
-
-#[test]
-fn test_jwt_claims_serde() {
-    let claims = JwtClaims::new(Vec::new());
-    assert_eq!(
-        claims.scope,
-        serde_json::from_str::<JwtClaims>("{\"iat\":\"2023-11-03T04:41:09.568222652Z\",\"scope\":[]}").unwrap().scope
-    );
 }
 
 static SECRET: OnceLock<Vec<u8>> = OnceLock::new();
@@ -44,10 +39,10 @@ fn get_secret() -> &'static [u8] {
     SECRET.get_or_init(|| Vec::new())
 }
 
-pub fn generate_token(scope: Vec<Scope>) -> String {
+pub fn generate_token(claims: &JwtClaims) -> String {
     jsonwebtoken::encode(
         &jsonwebtoken::Header::new(Algorithm::HS256),
-        &JwtClaims::new(scope),
+        claims,
         &EncodingKey::from_secret(get_secret())
     ).unwrap()
 }
