@@ -98,8 +98,8 @@ where
 
         if let Ok(token) = token {
             match decode_token(token) {
-                Ok(o) => token_invalid != self.required.iter().all(|s| o.scope.contains(s)),
-                Err(_) => todo!("erm"),
+                Ok(o) => { token_invalid = !self.required.iter().all(|s| o.scope.contains(s)); },
+                Err(_) => { token_invalid = true; },
             };
         } else {
             token_invalid = true;
