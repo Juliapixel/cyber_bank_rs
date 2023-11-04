@@ -20,7 +20,6 @@ async fn main() -> std::io::Result<()> {
             // authentication endpoints
             .service(
                 web::scope("/auth")
-                    .wrap(ScopeValidator::new(&[]))
                     .service(
                         // yeah, there's only one version, so what
                         web::scope("/v1")
