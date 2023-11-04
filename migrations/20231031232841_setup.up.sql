@@ -4,5 +4,6 @@ CREATE TABLE if not exists users (
     email text NOT NULL UNIQUE,
     username text NOT NULL UNIQUE,
     password bytea NOT NULL,
-    salt bytea NOT NULL
+    salt bytea NOT NULL,
+    creation_date timestamp with time zone NOT NULL
 );

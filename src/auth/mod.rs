@@ -10,7 +10,8 @@ struct DbUser {
     email: String,
     username: String,
     password: Vec<u8>,
-    salt: Vec<u8>
+    salt: Vec<u8>,
+    creation_date: chrono::DateTime<chrono::Utc>
 }
 
 /// salts and hashes the given password using the Argon2id hashing algorithm,

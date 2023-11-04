@@ -203,18 +203,20 @@ pub async fn register(req: HttpRequest, userinfo: Json<Registerer>) -> impl Resp
     let hashed_salted_passwd: Vec<u8> = super::salt_and_hash(userinfo.password.clone(), &salt);
 
     let insert = sqlx::query!(r"INSERT INTO users
-        (user_id, email, username, password, salt)
+        (user_id, email, username, password, salt, creation_date)
         VALUES (
         gen_random_uuid(),
         $1,
         $2,
         $3,
-        $4
+        $4,
+        $5
         );",
         userinfo.email,
         userinfo.username,
         hashed_salted_passwd,
-        &salt
+        &salt,
+        chrono::Utc::now()
     ).execute(pool).await;
     match insert {
         Ok(o) => {
