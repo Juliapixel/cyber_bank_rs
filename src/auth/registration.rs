@@ -1,6 +1,6 @@
 use std::sync::OnceLock;
 
-use actix_web::{http::StatusCode, web::Json, HttpRequest, Responder};
+use actix_web::{http::StatusCode, web::Json, HttpRequest, Responder, HttpResponse};
 use log::error;
 use rand::RngCore;
 use regex::Regex;
@@ -192,10 +192,7 @@ pub async fn register(req: HttpRequest, userinfo: Json<Registerer>) -> impl Resp
     };
 
     if !errors.is_empty() {
-        return Json(errors)
-            .customize()
-            .with_status(StatusCode::BAD_REQUEST)
-            .respond_to(&req);
+        return HttpResponse::BadRequest().json(errors);
     }
 
     let mut salt = [0u8; 64];
@@ -221,20 +218,14 @@ pub async fn register(req: HttpRequest, userinfo: Json<Registerer>) -> impl Resp
     match insert {
         Ok(o) => {
             if o.rows_affected() == 0 {
-                return Json(RegisterError::RegistrationError)
-                    .customize()
-                    .with_status(StatusCode::BAD_REQUEST)
-                    .respond_to(&req);
+                return HttpResponse::BadRequest().json(RegisterError::RegistrationError);
             } else {
-                return Json(()).customize().with_status(StatusCode::CREATED).respond_to(&req);
+                return HttpResponse::Created().finish();
             }
         },
         Err(e) => {
             error!("failed inserting user into table: {e}");
-            return Json(())
-                .customize()
-                .with_status(StatusCode::BAD_REQUEST)
-                .respond_to(&req);
+            return HttpResponse::BadRequest().json(RegisterError::RegistrationError);
         }
     };
 }
