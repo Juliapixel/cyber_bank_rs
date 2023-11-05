@@ -15,13 +15,14 @@ tokio = { version = "1.33", features = ["full"] }
 env_logger = { version = "0.10" }
 uuid = { version = "1.5", features = ["serde"]}
 rand = "0.8"
-bcrypt-pbkdf = "0.10"
 rust-argon2 = "2.0"
 regex = "1.10"
-log = "0.4.20"
+log = "0.4"
 dotenvy = "0.15"
-jsonwebtoken = "9.1.0"
-chrono = { version = "0.4.31", features = ["serde"] }
-actix-utils = "3.0.1"
-mime = "0.3.17"
-futures-util = "0.3.29"
+jsonwebtoken = "9.1"
+chrono = { version = "0.4", features = ["serde"] }
+actix-utils = "3.0"
+mime = "0.3"
+futures-util = "0.3"
+blake2 = "0.10"
+base64 = "0.21"

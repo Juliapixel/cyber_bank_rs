@@ -1,3 +1,5 @@
+use blake2::{Blake2b512, Digest};
+
 pub mod login;
 pub mod registration;
 
@@ -33,6 +35,12 @@ fn salt_and_hash(passwd: String, salt: &[u8]) -> Vec<u8> {
         }
     ).unwrap();
     return hashed_salted_passwd;
+}
+
+/// # ⚠️ WARNING ⚠️
+/// do not use for passwords dumbass
+fn hash(data: &[u8]) -> Vec<u8> {
+    Blake2b512::new().chain_update(data).finalize().to_vec()
 }
 
 /// adds the endpoints `/register` and `/login` to the service
