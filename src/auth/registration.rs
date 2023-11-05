@@ -1,6 +1,6 @@
 use std::sync::OnceLock;
 
-use actix_web::{http::StatusCode, web::Json, HttpRequest, Responder, HttpResponse};
+use actix_web::{web::Json, HttpRequest, Responder, HttpResponse};
 use log::error;
 use rand::RngCore;
 use regex::Regex;
