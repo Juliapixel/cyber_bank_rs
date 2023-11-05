@@ -23,6 +23,7 @@ Headers:
 - Content-type: application/json
 
 Content:
+
 ```json
 {
     "email": "{email}",
@@ -34,12 +35,6 @@ Content:
 ##### on success:
 
 HTTP Status 201
-
-Content:
-
-```json
-null
-```
 
 ##### on failure:
 
@@ -72,7 +67,12 @@ Content:
 
 HTTP Status 200
 
-TODO: return a JWT token
+Content:
+```json
+{
+    "token": "{token}"
+}
+```
 
 ##### on failure:
 
