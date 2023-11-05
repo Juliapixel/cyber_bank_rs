@@ -4,7 +4,7 @@ use actix_web::{dev::{Service, ServiceResponse, ServiceRequest}, body::{EitherBo
 use futures_util::TryFutureExt;
 use log::debug;
 
-use super::jwt::{Scope, TokenParsingError, decode_token};
+use super::jwt::{Scope, TokenParsingError, JwtClaims};
 
 pub struct ScopeValidatorMiddleware<S> {
     service: S,
@@ -96,9 +96,9 @@ where
         };
 
         if let Ok(token) = token {
-            match decode_token(token) {
+            match JwtClaims::decode_from_token(token) {
                 Ok(o) => { token_invalid = !self.required.iter().all(|s| o.scope.contains(s)); },
-                Err(_) => { token_invalid = true; },
+                Err(_e) => { token_invalid = true; },
             };
         } else {
             token_invalid = true;

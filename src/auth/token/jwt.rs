@@ -1,9 +1,12 @@
 use std::{sync::OnceLock, fmt::Display, future::{Ready, ready}};
 
 use actix_web::{FromRequest, ResponseError};
+use base64::{Engine, prelude::BASE64_STANDARD};
 use chrono::Utc;
 use jsonwebtoken::{EncodingKey, DecodingKey, Validation, Algorithm};
+use rand::RngCore;
 use serde::{Serialize, Deserialize};
+use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone)]
 #[serde(rename_all="snake_case")]
@@ -22,20 +25,39 @@ impl Scope {
 #[derive(Serialize, Deserialize, PartialEq, Eq, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct JwtClaims {
-    iat: chrono::DateTime<Utc>,
-    sub: String,
-    exp: chrono::DateTime<Utc>,
+    iat: i64,
+    sub: Uuid,
+    exp: i64,
     pub scope: Vec<Scope>
 }
 
 impl JwtClaims {
-    pub fn new(scope: Vec<Scope>, subject: String, expiration: chrono::DateTime<Utc>) -> Self {
+    pub fn new(scope: Vec<Scope>, subject: Uuid, expiration: chrono::DateTime<Utc>) -> Self {
         Self {
-            iat: chrono::Utc::now(),
+            iat: chrono::Utc::now().timestamp(),
             sub: subject,
-            exp: expiration,
+            exp: expiration.timestamp(),
             scope: scope
         }
+    }
+
+    pub fn decode_from_token(token: &str) -> Result<Self, jsonwebtoken::errors::Error> {
+        match jsonwebtoken::decode::<Self>(
+            token,
+            &DecodingKey::from_secret(get_secret()),
+            &Validation::new(Algorithm::HS256)
+        ) {
+            Ok(o) => Ok(o.claims),
+            Err(e) => Err(e)
+        }
+    }
+
+    pub fn generate_token(&self) -> String {
+        jsonwebtoken::encode(
+            &jsonwebtoken::Header::new(Algorithm::HS256),
+            &self,
+            &EncodingKey::from_secret(get_secret())
+        ).unwrap()
     }
 }
 
@@ -49,28 +71,22 @@ fn get_secret() -> &'static [u8] {
         }
         #[cfg(not(debug_assertions))]
         {
-            todo!("find a way to safely get a secret")
+            let user = std::env::var("USER")
+                .expect("$USER environment variable could not be retrieved!");
+            let entry = keyring::Entry::new("cyber_bank_rs", &user).unwrap();
+            match entry.get_password() {
+                Ok(o) => return BASE64_STANDARD.decode(o).unwrap(),
+                Err(_) => {
+                    entry.set_password(&BASE64_STANDARD.encode({
+                        let mut secret = vec![0u8; 32];
+                        rand::thread_rng().fill_bytes(&mut secret);
+                        secret
+                    })).unwrap();
+                    BASE64_STANDARD.decode(entry.get_password().unwrap()).unwrap()
+                },
+            }
         }
     })
-}
-
-pub fn generate_token(claims: &JwtClaims) -> String {
-    jsonwebtoken::encode(
-        &jsonwebtoken::Header::new(Algorithm::HS256),
-        claims,
-        &EncodingKey::from_secret(get_secret())
-    ).unwrap()
-}
-
-pub fn decode_token(token: &str) -> Result<JwtClaims, jsonwebtoken::errors::Error> {
-    match jsonwebtoken::decode::<JwtClaims>(
-        token,
-        &DecodingKey::from_secret(get_secret()),
-        &Validation::new(Algorithm::HS256)
-    ) {
-        Ok(o) => Ok(o.claims),
-        Err(e) => Err(e)
-    }
 }
 
 pub struct TokenHeader(String);
