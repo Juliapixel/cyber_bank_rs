@@ -15,9 +15,8 @@ struct ValidLoginResponse {
     token: String
 }
 
-/// checks that given credentials are valid, and will, in the future return a
+/// checks that given credentials are valid and returns a
 /// scoped authorization token that allows users to perform common tasks
-// TODO: implement authorization token
 pub async fn login(req: HttpRequest, userinfo: Json<LoginRequester>) -> impl Responder {
     let selection = sqlx::query_as!(
         super::DbUser,

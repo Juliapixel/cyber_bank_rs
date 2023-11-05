@@ -1,5 +1,5 @@
 use actix_web::{HttpServer, App, web, middleware::Logger};
-use cyber_bank_rs::{db, auth::token::middleware::ScopeValidator};
+use cyber_bank_rs::{db, auth::token::{middleware::ScopeValidator, jwt::Scope}};
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
