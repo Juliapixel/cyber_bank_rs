@@ -73,7 +73,6 @@ where
     }
 
     fn call(&self, req: ServiceRequest) -> Self::Future {
-        use ScopeValidationError as Sve;
         let mut token_invalid = false;
 
         let token = if let Some(header) = req.headers().get("Authorization") {

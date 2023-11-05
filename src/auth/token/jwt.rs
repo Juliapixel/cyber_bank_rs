@@ -5,10 +5,18 @@ use chrono::Utc;
 use jsonwebtoken::{EncodingKey, DecodingKey, Validation, Algorithm};
 use serde::{Serialize, Deserialize};
 
-#[derive(Serialize, Deserialize, PartialEq, Eq, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone)]
 #[serde(rename_all="snake_case")]
 pub enum Scope {
+    User,
+    UserInfo,
+}
 
+impl Scope {
+    pub const USER_LOGIN: &[Self] = &[
+        Self::User,
+        Self::UserInfo
+    ];
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Eq, Debug)]
@@ -34,9 +42,16 @@ impl JwtClaims {
 static SECRET: OnceLock<Vec<u8>> = OnceLock::new();
 
 fn get_secret() -> &'static [u8] {
-    todo!("lazily get secret from somewhere!");
-
-    SECRET.get_or_init(|| Vec::new())
+    SECRET.get_or_init(|| {
+        #[cfg(debug_assertions)]
+        {
+            b"debug".to_vec()
+        }
+        #[cfg(not(debug_assertions))]
+        {
+            todo!("find a way to safely get a secret")
+        }
+    })
 }
 
 pub fn generate_token(claims: &JwtClaims) -> String {
