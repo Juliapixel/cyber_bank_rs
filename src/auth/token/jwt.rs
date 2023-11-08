@@ -16,7 +16,7 @@ pub enum Scope {
 }
 
 impl Scope {
-    pub const USER_LOGIN: &[Self] = &[
+    pub const USER_LOGIN: &'static [Self] = &[
         Self::User,
         Self::UserInfo
     ];
