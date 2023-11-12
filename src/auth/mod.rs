@@ -7,7 +7,6 @@ pub mod token;
 
 #[allow(dead_code)]
 struct DbUser {
-    id: i64,
     user_id: uuid::Uuid,
     email: String,
     username: String,
