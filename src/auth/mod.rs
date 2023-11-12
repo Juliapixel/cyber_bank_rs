@@ -45,5 +45,5 @@ fn hash(data: &[u8]) -> Vec<u8> {
 /// adds the endpoints `/register` and `/login` to the service
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.route("/register", actix_web::web::post().to(registration::register))
-        .route("/login", actix_web::web::get().to(login::login));
+        .route("/login", actix_web::web::post().to(login::login));
 }
