@@ -82,6 +82,8 @@ HTTP Status 403
 ## Building
 building requires a connection to a PostgreSQL database with the correct relations set up.
 
+**⚠️ only tested on linux**
+
 ### Setting up development database
 1. start up a PostgreSQL server
 2. create a database called `cyber_bank_rs`
